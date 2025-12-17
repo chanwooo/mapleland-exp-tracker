@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>메이플랜드 EXP 트래커</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- Tesseract.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🍁 메이플랜드 EXP 트래커</h1>
+        </header>
+
+        <div class="controls">
+            <button id="btnSelectScreen" class="btn btn-primary">
+                <span class="icon">🖥️</span> 화면 선택
+            </button>
+            <button id="btnSelectExp" class="btn btn-secondary" disabled>
+                <span class="icon">⚡</span> EXP 영역
+            </button>
+            <button id="btnSelectGold" class="btn btn-secondary" disabled>
+                <span class="icon">💰</span> 메소 영역 (선택)
+            </button>
+        </div>
+
+        <div class="preview-container">
+            <div class="preview-wrapper">
+                <canvas id="previewCanvas"></canvas>
+                <div id="selectionOverlay" class="selection-overlay hidden">
+                    <div id="selectionBox" class="selection-box"></div>
+                </div>
+                <div id="regionIndicators" class="region-indicators"></div>
+            </div>
+            <div class="preview-placeholder" id="previewPlaceholder">
+                <p>화면을 선택하면 여기에 프리뷰가 표시됩니다</p>
+            </div>
+        </div>
+
+        <div class="region-info">
+            <div class="region-item">
+                <span class="region-label">EXP 영역:</span>
+                <span id="expRegionInfo" class="region-value">미설정</span>
+            </div>
+            <div class="region-item">
+                <span class="region-label">메소 영역:</span>
+                <span id="goldRegionInfo" class="region-value">미설정</span>
+            </div>
+        </div>
+
+        <div class="action-controls">
+            <button id="btnStart" class="btn btn-success" disabled>
+                <span class="icon">▶️</span> 분석 시작
+            </button>
+            <button id="btnStop" class="btn btn-danger" disabled>
+                <span class="icon">⏹️</span> 분석 중지
+            </button>
+            <button id="btnReset" class="btn btn-warning">
+                <span class="icon">🔄</span> 리셋
+            </button>
+            <button id="btnPip" class="btn btn-info" disabled>
+                <span class="icon">📺</span> PIP 열기
+            </button>
+            <div class="interval-selector">
+                <span class="interval-label">갱신:</span>
+                <select id="intervalSelect">
+                    <option value="1000">1초</option>
+                    <option value="3000">3초</option>
+                    <option value="5000" selected>5초</option>
+                    <option value="10000">10초</option>
+                </select>
+            </div>
+            <button id="btnClearAll" class="btn btn-secondary btn-small">
+                <span class="icon">🗑️</span> 전체 초기화
+            </button>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-item">
+                <span class="status-label">상태:</span>
+                <span id="statusText" class="status-value">대기 중</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">경과:</span>
+                <span id="elapsedTime" class="status-value">00:00:00</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">OCR:</span>
+                <span id="ocrStatus" class="status-value">초기화 중...</span>
+            </div>
+        </div>
+
+        <div class="results-panel" id="resultsPanel">
+            <h3>분석 결과</h3>
+            <div class="results-grid">
+                <div class="result-card exp-card">
+                    <h4>⚡ 경험치</h4>
+                    <div class="result-row">
+                        <span>현재:</span>
+                        <span id="currentExp">-</span>
+                    </div>
+                    <div class="result-row">
+                        <span>변화:</span>
+                        <span id="expChange">-</span>
+                    </div>
+                    <div class="result-row">
+                        <span>시간당:</span>
+                        <span id="expPerHour">-</span>
+                    </div>
+                    <div class="result-row">
+                        <span>레벨업:</span>
+                        <span id="timeToLevel">-</span>
+                    </div>
+                </div>
+                <div class="result-card gold-card">
+                    <h4>💰 메소</h4>
+                    <div class="result-row">
+                        <span>현재:</span>
+                        <span id="currentGold">-</span>
+                    </div>
+                    <div class="result-row">
+                        <span>변화:</span>
+                        <span id="goldChange">-</span>
+                    </div>
+                    <div class="result-row">
+                        <span>시간당:</span>
+                        <span id="goldPerHour">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden elements for PIP -->
+    <video id="sourceVideo" style="display: none;"></video>
+    <canvas id="pipCanvas" style="display: none;"></canvas>
+    <video id="pipVideo" style="display: none;"></video>
+
+    <!-- JavaScript Modules -->
+    <script src="js/storage.js"></script>
+    <script src="js/capture.js"></script>
+    <script src="js/regionSelector.js"></script>
+    <script src="js/ocr.js"></script>
+    <script src="js/analyzer.js"></script>
+    <script src="js/pip.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
+
