@@ -54,6 +54,9 @@ const App = (function() {
         // PIP 대기 화면 렌더링
         PIPModule.renderWaiting();
 
+        // 기록 테이블 렌더링
+        renderHistoryTable();
+
         console.log('🍁 초기화 완료');
     }
 
@@ -85,13 +88,11 @@ const App = (function() {
             goldPerHour: document.getElementById('goldPerHour'),
             intervalSelect: document.getElementById('intervalSelect'),
             btnClearAll: document.getElementById('btnClearAll'),
-            // 기록 모달
-            btnHistory: document.getElementById('btnHistory'),
-            historyModal: document.getElementById('historyModal'),
-            btnCloseModal: document.getElementById('btnCloseModal'),
+            // 기록 패널
             historyTableBody: document.getElementById('historyTableBody'),
             historyEmpty: document.getElementById('historyEmpty'),
-            btnClearHistory: document.getElementById('btnClearHistory')
+            btnClearHistory: document.getElementById('btnClearHistory'),
+            historyTableWrapper: document.querySelector('.history-table-wrapper')
         };
     }
 
@@ -189,17 +190,8 @@ const App = (function() {
             }
         });
 
-        // 기록 모달
-        elements.btnHistory.addEventListener('click', openHistoryModal);
-        elements.btnCloseModal.addEventListener('click', closeHistoryModal);
+        // 기록 전체 삭제
         elements.btnClearHistory.addEventListener('click', handleClearHistory);
-        
-        // 모달 외부 클릭시 닫기
-        elements.historyModal.addEventListener('click', (e) => {
-            if (e.target === elements.historyModal) {
-                closeHistoryModal();
-            }
-        });
     }
 
     /**
@@ -273,6 +265,8 @@ const App = (function() {
         if (record) {
             Storage.saveRecord(record);
             console.log('📝 사냥 기록 저장됨:', record);
+            // 기록 테이블 업데이트
+            renderHistoryTable();
         }
 
         isAnalyzing = false;
@@ -392,7 +386,7 @@ const App = (function() {
      * 전체 초기화 핸들러 (모든 설정 삭제)
      */
     function handleClearAll() {
-        if (confirm('모든 설정과 영역을 초기화하시겠습니까?\n(영역 설정도 삭제됩니다)')) {
+        if (confirm('영역 설정을 초기화하시겠습니까?')) {
             stopAnalysis();
             Analyzer.reset();
             RegionSelector.clearRegions();
@@ -474,21 +468,6 @@ const App = (function() {
     }
 
     /**
-     * 기록 모달 열기
-     */
-    function openHistoryModal() {
-        renderHistoryTable();
-        elements.historyModal.classList.add('active');
-    }
-
-    /**
-     * 기록 모달 닫기
-     */
-    function closeHistoryModal() {
-        elements.historyModal.classList.remove('active');
-    }
-
-    /**
      * 기록 테이블 렌더링
      */
     function renderHistoryTable() {
@@ -497,12 +476,16 @@ const App = (function() {
         if (history.length === 0) {
             elements.historyTableBody.innerHTML = '';
             elements.historyEmpty.classList.add('active');
-            document.querySelector('.history-table-wrapper').style.display = 'none';
+            if (elements.historyTableWrapper) {
+                elements.historyTableWrapper.style.display = 'none';
+            }
             return;
         }
 
         elements.historyEmpty.classList.remove('active');
-        document.querySelector('.history-table-wrapper').style.display = 'block';
+        if (elements.historyTableWrapper) {
+            elements.historyTableWrapper.style.display = 'block';
+        }
 
         elements.historyTableBody.innerHTML = history.map(record => {
             // 날짜 포맷: MM/DD HH:mm
