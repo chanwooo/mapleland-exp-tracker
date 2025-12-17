@@ -1,0 +1,44 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Update cache version
+        run: |
+          TIMESTAMP=$(date +%Y%m%d%H%M%S)
+          echo "Updating version to: $TIMESTAMP"
+          sed -i "s/?v=[0-9]*/?v=$TIMESTAMP/g" index.html
+          cat index.html | grep "?v=" | head -5
+
+      - name: Commit version update
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "🔄 chore: update cache version"
+          file_pattern: index.html
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
