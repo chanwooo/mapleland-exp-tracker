@@ -181,10 +181,16 @@ const Analyzer = (function() {
                 console.log('메소 감소 무시 - 유효값 유지:', lastValidGold, '(인식값:', data.gold, ', 무시횟수:', goldIgnoreCount + ')');
                 
                 // 5번 연속 무시되면 기존 값이 잘못됐다고 판단, 새 값 채택
+                // 단, 시작 메소보다 작아지는 방향으로는 업데이트 안함 (인벤토리 닫힘 방지)
                 if (goldIgnoreCount >= 5) {
-                    console.log('메소 5회 연속 무시 - 새 값으로 교체:', data.gold);
-                    lastValidGold = data.gold;
-                    goldIgnoreCount = 0;
+                    if (startData.gold !== null && data.gold < startData.gold) {
+                        console.log('메소 5회 연속 무시 - 시작값보다 작아 교체 안함 (시작:', startData.gold, ', 인식:', data.gold + ')');
+                        goldIgnoreCount = 0; // 카운터만 리셋
+                    } else {
+                        console.log('메소 5회 연속 무시 - 새 값으로 교체:', data.gold);
+                        lastValidGold = data.gold;
+                        goldIgnoreCount = 0;
+                    }
                 }
             }
         }
