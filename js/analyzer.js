@@ -21,6 +21,7 @@ const Analyzer = (function() {
 
     // 마지막 유효한 메소 값 (인벤토리 닫힘 감지용)
     let lastValidGold = null;
+    let goldIgnoreCount = 0; // 메소 무시 연속 카운터
 
     // 마지막 유효한 EXP 값 (OCR 오류 필터링용)
     let lastValidExp = null;
@@ -172,10 +173,19 @@ const Analyzer = (function() {
             // 현재 인식된 값이 마지막 유효값보다 크거나 같으면 업데이트
             if (lastValidGold === null || data.gold >= lastValidGold) {
                 lastValidGold = data.gold;
+                goldIgnoreCount = 0; // 카운터 리셋
                 console.log('메소 업데이트:', lastValidGold);
             } else {
                 // 값이 줄어들면 무시 (인벤토리 닫힘 또는 잘못된 인식)
-                console.log('메소 감소 무시 - 유효값 유지:', lastValidGold, '(인식값:', data.gold + ')');
+                goldIgnoreCount++;
+                console.log('메소 감소 무시 - 유효값 유지:', lastValidGold, '(인식값:', data.gold, ', 무시횟수:', goldIgnoreCount + ')');
+                
+                // 5번 연속 무시되면 기존 값이 잘못됐다고 판단, 새 값 채택
+                if (goldIgnoreCount >= 5) {
+                    console.log('메소 5회 연속 무시 - 새 값으로 교체:', data.gold);
+                    lastValidGold = data.gold;
+                    goldIgnoreCount = 0;
+                }
             }
         }
 
@@ -220,6 +230,7 @@ const Analyzer = (function() {
         };
 
         lastValidGold = null;
+        goldIgnoreCount = 0;
         lastValidExp = null;
         lastValidPercent = null;
 
